@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Виртуальная доска задач</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    h1 { text-align: center; }
+    input, textarea, button { display: block; margin: 10px 0; width: 100%; padding: 8px; }
+    .task { background: #fff; padding: 10px; margin: 10px 0; border-left: 4px solid #007BFF; }
+    .task small { color: gray; }
+    button.delete { background: #dc3545; color: white; }
+  </style>
+</head>
+<body>
+  <h1>Моя доска задач</h1>
+  <input type="text" id="title" placeholder="Название задачи" />
+  <textarea id="description" placeholder="Описание задачи"></textarea>
+  <input type="date" id="deadline" />
+  <button onclick="addTask()">Добавить задачу</button>
+
+  <div id="taskList"></div>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+
+    function displayTasks() {
+      const list = document.getElementById("taskList");
+      list.innerHTML = "";
+      tasks.forEach((task, index) => {
+        const el = document.createElement("div");
+        el.className = "task";
+        el.innerHTML = `
+          <strong>${task.title}</strong><br/>
+          ${task.description}<br/>
+          <small>Срок: ${task.deadline}</small><br/>
+          <button class="delete" onclick="deleteTask(${index})">Удалить</button>
+        `;
+        list.appendChild(el);
+      });
+    }
+
+    function addTask() {
+      const title = document.getElementById("title").value;
+      const description = document.getElementById("description").value;
+      const deadline = document.getElementById("deadline").value;
+      if (title && deadline) {
+        tasks.push({ title, description, deadline });
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        displayTasks();
+        document.getElementById("title").value = "";
+        document.getElementById("description").value = "";
+        document.getElementById("deadline").value = "";
+      }
+    }
+
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+      displayTasks();
+    }
+
+    displayTasks();
+  </script>
+</body>
+</html>
